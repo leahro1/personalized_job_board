@@ -1,0 +1,58 @@
+# Check for job boards: https://reducto.ai https://www.kapa.ai runware.ai 
+
+# 11x.ai - $50M Series B a16z October '24
+https://www.11x.ai/careers
+
+# Apono $15M Series A
+https://www.apono.io/careers/
+
+# Covariant - robotics for warehouses
+https://covariant.ai/careers/
+
+# Datapelago - $47M Eclipse, Qualcomm
+https://www.datapelago.io/careers#positions
+
+# ElevenLabs - raising at $3B val October '24
+https://jobs.ashbyhq.com/elevenlabs/
+
+# Merge - global API
+https://www.merge.dev/careers
+
+# Monte Carlo - came across them during Revrod interview
+https://jobs.ashbyhq.com/montecarlodata#
+
+# Nvidia - public
+https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
+
+# OpenAI - who the fuck knows
+https://openai.com/careers/search/
+
+# Pallet - $18M Series A BCV - supply chain
+https://job-boards.greenhouse.io/pallet
+
+# Poolside - $500M Series B BCV
+https://poolside.ai/careers
+
+# Resolve AI - $35M seed Greylock
+https://jobs.ashbyhq.com/Resolve%20AI
+
+# Rippl - Dementia care $23M Series A GC & GV
+https://ripplcare.com/careers/
+
+# Supabase
+https://supabase.com/careers
+
+# Thread AI - $6m seed Index
+https://www.threadai.com/company
+
+# Together.ai - $106M Series A Salesforce Ventures March '24
+https://job-boards.greenhouse.io/togetherai
+
+# voyage.ai - $20M October 2024
+https://www.voyageai.com/careers#positions
+
+# wispr - voice interaction with AI - NEA 8VC
+https://jobs.lever.co/WisprAI
+
+# x.ai - 
+https://x.ai/careers
