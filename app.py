@@ -9,20 +9,14 @@ app = Flask(__name__)
 def detect_job_board_provider(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Detect Greenhouse
     
     if 'boards.greenhouse.io' in response.text or soup.find_all('iframe', src=lambda x: x and 'greenhouse' in x):
         return 'greenhouse'
-
-    # Detect Lever
     if 'jobs.lever.co' in response.text or soup.find_all('iframe', src=lambda x: x and 'lever' in x):
         return 'lever'
-    # Detect Workday
     if 'workday.com' in response.text or 'workday' in response.text:
         return 'workday'
-    # Detect Notion
-    if 'notion.so' in url or 'notion' in response.text:
+    if 'notion.so' in response.text or 'Notion' in response.text:
         return 'notion'
     
     scripts = soup.find_all('script')
@@ -33,6 +27,8 @@ def detect_job_board_provider(url):
             return 'lever'
         if 'workday' in str(script):
             return 'workday'
+        if 'notion' in str(script):
+            return 'notion'
     
     return 'unknown'
 
@@ -58,34 +54,23 @@ def fetch_jobs_from_lever(company_slug):
     else:
         return []
 
-# Fetch jobs from Notion
+# Scraping logic for Notion
 def fetch_jobs_from_notion(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-    
     jobs = []
-    for job in soup.find_all('div', class_='notion-text-block'):
-        job_title = job.get_text()
-        job_url = url  # Since Notion often does not have job-specific URLs
-        jobs.append({'title': job_title, 'url': job_url})
-
+    
+    # Notion job pages typically have specific div elements with text content
+    job_elements = soup.find_all('div', class_='notion-block')
+    
+    for job in job_elements:
+        title = job.text.strip()
+        if title:
+            jobs.append({'title': title, 'url': url})
+    
     return jobs
-# Main function to fetch jobs based on the detected provider
-def fetch_jobs(url):
-    provider = detect_job_board_provider(url)
-    if provider == 'greenhouse':
-        company_slug = "your_company_slug"  # Adjust for specific company
-        return fetch_jobs_from_greenhouse(company_slug)
-    elif provider == 'lever':
-        company_slug = "your_company_slug"  # Adjust for specific company
-        return fetch_jobs_from_lever(company_slug)
-    elif provider == 'notion':
-        return fetch_jobs_from_notion(url)
-    else:
-        print(f"Provider '{provider}' not supported or unknown.")
-        return []
 
-# Store jobs in database
+# Store jobs in the database
 def store_jobs_in_db(jobs):
     conn = sqlite3.connect('jobs.db')
     cursor = conn.cursor()
@@ -115,6 +100,8 @@ def home():
         elif provider == 'lever':
             company_slug = "company_slug_here"  # Replace with dynamic slug detection
             jobs = fetch_jobs_from_lever(company_slug)
+        elif provider == 'notion':
+            jobs = fetch_jobs_from_notion(url)
         else:
             jobs = []
         
