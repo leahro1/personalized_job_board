@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Board Scraper</title>
+</head>
+<body>
+    <h1>Job Board Scraper</h1>
+    <form method="POST" action="/">
+        <input type="text" name="url" placeholder="Enter career page URL">
+        <button type="submit">Scrape Jobs</button>
+    </form>
+    {% if jobs %}
+        <h2>Provider: {{ provider }}</h2>
+        <ul>
+            {% for job in jobs %}
+                <li>{{ job.title }} - <a href="{{ job.url }}" target="_blank">Apply</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

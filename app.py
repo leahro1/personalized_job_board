@@ -1,34 +1,42 @@
-from flask import Flask
+from flask import Flask, request, render_template
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
 
 app = Flask(__name__)
 
-# Detect the job board provider based on page content
+# Detect the job board provider
 def detect_job_board_provider(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Detect Greenhouse
+    
     if 'boards.greenhouse.io' in response.text or soup.find_all('iframe', src=lambda x: x and 'greenhouse' in x):
         return 'greenhouse'
 
     # Detect Lever
     if 'jobs.lever.co' in response.text or soup.find_all('iframe', src=lambda x: x and 'lever' in x):
         return 'lever'
-
     # Detect Workday
     if 'workday.com' in response.text or 'workday' in response.text:
         return 'workday'
-
     # Detect Notion
     if 'notion.so' in url or 'notion' in response.text:
         return 'notion'
-
+    
+    scripts = soup.find_all('script')
+    for script in scripts:
+        if 'greenhouse' in str(script):
+            return 'greenhouse'
+        if 'lever' in str(script):
+            return 'lever'
+        if 'workday' in str(script):
+            return 'workday'
+    
     return 'unknown'
 
-# Fetch jobs from Greenhouse
+# Scraping logic for Greenhouse
 def fetch_jobs_from_greenhouse(company_slug):
     api_url = f"https://boards-api.greenhouse.io/v1/boards/{company_slug}/jobs"
     response = requests.get(api_url)
@@ -37,10 +45,9 @@ def fetch_jobs_from_greenhouse(company_slug):
         jobs = [{'title': job['title'], 'url': job['absolute_url']} for job in data['jobs']]
         return jobs
     else:
-        print("Error fetching jobs from Greenhouse")
         return []
 
-# Fetch jobs from Lever
+# Scraping logic for Lever
 def fetch_jobs_from_lever(company_slug):
     api_url = f"https://api.lever.co/v0/postings/{company_slug}"
     response = requests.get(api_url)
@@ -49,7 +56,6 @@ def fetch_jobs_from_lever(company_slug):
         jobs = [{'title': job['text'], 'url': job['hostedUrl']} for job in data]
         return jobs
     else:
-        print("Error fetching jobs from Lever")
         return []
 
 # Fetch jobs from Notion
@@ -64,7 +70,6 @@ def fetch_jobs_from_notion(url):
         jobs.append({'title': job_title, 'url': job_url})
 
     return jobs
-
 # Main function to fetch jobs based on the detected provider
 def fetch_jobs(url):
     provider = detect_job_board_provider(url)
@@ -80,11 +85,10 @@ def fetch_jobs(url):
         print(f"Provider '{provider}' not supported or unknown.")
         return []
 
-# Store jobs in the SQLite database
+# Store jobs in database
 def store_jobs_in_db(jobs):
     conn = sqlite3.connect('jobs.db')
     cursor = conn.cursor()
-
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS jobs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,23 +96,31 @@ def store_jobs_in_db(jobs):
         url TEXT UNIQUE
     )
     ''')
-
     for job in jobs:
         try:
             cursor.execute("INSERT INTO jobs (title, url) VALUES (?, ?)", (job['title'], job['url']))
         except sqlite3.IntegrityError:
-            pass  # Ignore duplicates
-
+            pass
     conn.commit()
     conn.close()
 
-# Flask route to trigger job scraping
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    url = "https://foxglove.dev/careers"  # Example careers page
-    jobs = fetch_jobs(url)
-    store_jobs_in_db(jobs)
-    return "Jobs fetched and stored successfully!"
+    if request.method == 'POST':
+        url = request.form['url']
+        provider = detect_job_board_provider(url)
+        if provider == 'greenhouse':
+            company_slug = "company_slug_here"  # Replace with dynamic slug detection
+            jobs = fetch_jobs_from_greenhouse(company_slug)
+        elif provider == 'lever':
+            company_slug = "company_slug_here"  # Replace with dynamic slug detection
+            jobs = fetch_jobs_from_lever(company_slug)
+        else:
+            jobs = []
+        
+        store_jobs_in_db(jobs)
+        return render_template('index.html', jobs=jobs, provider=provider)
+    return render_template('index.html', jobs=None, provider=None)
 
 if __name__ == "__main__":
     app.run(debug=True)
