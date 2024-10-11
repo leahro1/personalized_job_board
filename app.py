@@ -11,7 +11,7 @@ import logging
 # Set up basic configuration for logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Email details
+# Email detail
 email_user = 'customjobfeed@gmail.com'
 email_password = 'tehhif-Daxfir-3qivji'
 recipient_email = 'leahro1@gmail.com'
