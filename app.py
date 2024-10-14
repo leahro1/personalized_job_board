@@ -7,6 +7,8 @@ import time
 from bs4 import BeautifulSoup
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+import pytz
 
 # Set up basic configuration for logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -204,7 +206,7 @@ def job_search_and_notify():
 
 # Schedule and run the job
 scheduler = BackgroundScheduler()
-scheduler.add_job(job_search_and_notify, 'cron', hour=8)
+scheduler.add_job(job_search_and_notify, 'cron', hour=8, timezone=timezone)
 scheduler.start()
 
 try:
