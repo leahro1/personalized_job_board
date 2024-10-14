@@ -204,8 +204,11 @@ def job_search_and_notify():
     if email_body.strip():
         send_email("Daily Job Listings", email_body)
 
-# Schedule and run the job
+# Instantiate scheduler with timezone
 scheduler = BackgroundScheduler()
+timezone = pytz.timezone('UTC')
+
+# Schedule and run the job
 scheduler.add_job(job_search_and_notify, 'cron', hour=8, timezone=timezone)
 scheduler.start()
 

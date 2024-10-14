@@ -18,11 +18,17 @@ https://www.datapelago.io/careers#positions
 # ElevenLabs - raising at $3B val October '24
 https://jobs.ashbyhq.com/elevenlabs/
 
+# Lovable - AI for engineers (Sweden)
+https://lovable.dev/careers/
+
 # Merge - global API
 https://www.merge.dev/careers
 
 # Monte Carlo - came across them during Revrod interview
 https://jobs.ashbyhq.com/montecarlodata#
+
+# Mytra AI
+https://mytra.ai/careers
 
 # Nvidia - public
 https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
