@@ -3,15 +3,15 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import sqlite3
-import schedule
 import time
 from bs4 import BeautifulSoup
 import logging
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Set up basic configuration for logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Email detail
+# Email details
 email_user = 'customjobfeed@gmail.com'
 email_password = 'tehhif-Daxfir-3qivji'
 recipient_email = 'leahro1@gmail.com'
@@ -192,7 +192,8 @@ def job_search_and_notify():
             logging.warning(f"Provider not detected for {company_url}")
             continue
 
-        new_jobs = [job for job in jobs if not job_exists_in_db(job['url'])]
+        filtered_jobs = filter_jobs_by_keyword(jobs, job_keywords)
+        new_jobs = [job for job in filtered_jobs if not job_exists_in_db(job['url'])]
         if new_jobs:
             for job in new_jobs:
                 email_body += f"{job['title']} - {job['url']}\n"
@@ -202,7 +203,12 @@ def job_search_and_notify():
         send_email("Daily Job Listings", email_body)
 
 # Schedule and run the job
-schedule.every().day.at("08:00").do(job_search_and_notify)
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+scheduler = BackgroundScheduler()
+scheduler.add_job(job_search_and_notify, 'cron', hour=8)
+scheduler.start()
+
+try:
+    while True:
+        time.sleep(60)
+except (KeyboardInterrupt, SystemExit):
+    scheduler.shutdown()
